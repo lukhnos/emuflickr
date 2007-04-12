@@ -25,8 +25,11 @@ class PhotosController < ApplicationController
     @format   = params[:format]    
     @real_filename = "%s.%s" % [@filename, @format]
     
-    data = IO.read(File.join(RAILS_ROOT, "example_photos", "example_thumbnail.jpg"))
-    
-    send_data(data, :type => 'image/jpeg; charset=utf-8; header=present', :filename => @real_filename, :disposition => "inline")
+	f= File.open( File.join(RAILS_ROOT, "example_photos", "example_thumbnail.jpg") )
+	f.binmode	
+	data = f.read
+	f.close
+	
+    send_data( data, :type => 'image/jpeg; charset=utf-8; header=present', :filename => @real_filename)
   end
 end
