@@ -25,11 +25,13 @@ class PhotosController < ApplicationController
     @format   = params[:format]    
     @real_filename = "%s.%s" % [@filename, @format]
     
-	f= File.open( File.join(RAILS_ROOT, "example_photos", "example_thumbnail.jpg") )
-	f.binmode	
-	data = f.read
-	f.close
+    photo = Photo.find(:first , :order=>"id desc" , :limit =>"1" )
+    
+	#f= File.open( File.join(RAILS_ROOT, "example_photos", "example_thumbnail.jpg") )
+	#f.binmode	
+	#data = f.read
+	#f.close
 	
-    send_data( data, :type => 'image/jpeg; charset=utf-8; header=present', :filename => @real_filename, :disposition => "inline")
+    send_data( Base64.decode64(photo.data) , :type => 'image/jpeg; charset=utf-8; header=present', :filename => @real_filename, :disposition => "inline")
   end
 end
