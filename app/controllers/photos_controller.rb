@@ -30,6 +30,6 @@ class PhotosController < ApplicationController
 	data = f.read
 	f.close
 	
-    send_data( data, :type => 'image/jpeg; charset=utf-8; header=present', :filename => @real_filename)
+    send_data( data, :type => 'image/jpeg; charset=utf-8; header=present', :filename => @real_filename, :disposition => "inline")
   end
 end
