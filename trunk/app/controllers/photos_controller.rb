@@ -22,10 +22,17 @@ class PhotosController < ApplicationController
       @size = :square
     end
     
+    rfn = @filename.split("_")
+    
+    logger.info "fetching photo id = #{rfn[1]}"
+    realid = rfn[0]
+    
+    
     @format   = params[:format]    
     @real_filename = "%s.%s" % [@filename, @format]
     
-    photo = Photo.find(:first , :order=>"id desc" , :limit =>"1" )
+    photo = Photo.find(realid)
+#    photo = Photo.find(1)
     
 	#f= File.open( File.join(RAILS_ROOT, "example_photos", "example_thumbnail.jpg") )
 	#f.binmode	
