@@ -94,9 +94,86 @@ class EmuFlickrResponse
 
     result
   end
-  # def to_xml
-    # @data.to_xml
-  # end
+  
+  def to_xml_element_from_hash(hash)
+    
+    puts hash.to_json
+    
+    attr = []
+    text = nil
+    tail = ""
+    
+    hash.each_key do |k|
+      v = hash[k]
+      
+      nodename = k
+      
+      puts "key = #{k}, value class =#{v.class}"
+      if (v.class == String)
+        puts "attr #{k}=\"#{v}\""
+        attr << "#{k}=\"#{v}\""
+      elsif (v.class == Hash && v[:_content])
+        text = v[:_content].to_s
+      elsif (v.class == Hash)
+        
+        attr_only = true
+        v.each_key do |vv|
+          if vv.class == Hash
+            attr_only = false
+          end
+        end
+        puts "attr only? #{attr_only}"
+        
+        if attr_only
+          puts "emtting hash as attr node"
+          v.each_key do |vv|
+            puts "#{vv}=\"#{v[vv]}\""
+            attr << "#{vv}=\"#{v[vv]}\""
+          end
+          puts "finished emtting"
+        else
+          text = to_xml_element_from_hash(v)
+        end
+      elsif (v.class == Array)
+        text = ""
+        v.each do |element|
+          h = {}
+          h[k] = element
+          text += to_xml_element_from_hash(h)
+        end
+        return text
+      end
+      
+      if attr.empty?
+        head = "<#{k.to_s}"
+      else
+        head = "<#{k.to_s} #{attr.join " "}"
+      end
+      puts "head = #{head}"
+      
+      if text
+        head += ">"
+        tail = "</#{k.to_s}>"
+      else
+        head += "/>"
+      end
+      puts "head = #{head}, text=#{text}, tail = #{tail}"
+      
+      rsp = "#{head}#{text}#{tail}"
+      puts "return = #{rsp}"
+      rsp
+    end
+  end
+  
+  def to_xml_ours
+    xmldoc = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    xmldoc += to_xml_element_from_hash(@data)
+    xmldoc
+  end
+  
+  def to_xml_original
+    @data.to_xml
+  end
 
   # for debug
   def debug_key
@@ -180,7 +257,9 @@ class EFRTest < Test::Unit::TestCase
     efr.outer.photo = {:id=>'1'}
     efr.outer.photo = {:id=>'2'}
     puts efr.to_json
+    puts efr.to_xml_original
     puts efr.to_xml
+    puts efr.to_xml_ours
   end
 end
 
