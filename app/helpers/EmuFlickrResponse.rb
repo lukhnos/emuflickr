@@ -3,6 +3,22 @@ require 'rubygems'
 require 'json'
 require 'active_support'
 
+# class Hash
+  # def to_rest
+    # result = '<?xml version="1.0" encoding="UTF8" ?><rsp stat="ok">'
+    # self.each{ |pair|
+      # result += "<#{pair[0]}"
+      # pair[1].each{ |i| result += " #{i[0]}=\"#{i[1]}\"" unless i[0] == :_content }
+      # if pair[1][:_content]
+        # result += ">#{pair[1][:_content]}</#{pair[0]}>"
+      # else
+        # result += ' />'
+      # end
+    # }
+    # result += '</rsp>'
+  # end
+# end
+
 class EmuFlickrResponse
   def initialize
     @data = {}
@@ -33,10 +49,54 @@ class EmuFlickrResponse
   def to_json
     @data.to_json
   end
+  # def to_xml
+    # result = '<?xml version="1.0" encoding="UTF8" ?><rsp stat="ok">'
+    # @data.each{ |i|
+      # result += "<#{i}"
+      # if i[1].class.kind_of? Hash
+        # i[1].each{ |ii|
+          # result += " #{ii[0]}=\"#{ii[1]}\""
+        # }
+      # else
+        # result += " #{i[0]}=\"#{i[1]}\""
+        # ;
+      # end
+    # }
+    # result += '</rsp>'
+    # puts
+    # puts @data.inspect
+    # puts
+    # @data.to_rest
+  # end
   def to_xml
-    @data.to_xml
-    # modify here
+    # snip <hash> ... </hash>
+    result = @data.to_xml.sub(/<hash>/, '<rsp stat="ok">').sub(/<\/hash>/, '</rsp>')
+    result = @data.to_xml.sub(%r{(.+)<hash>(.+)</hash>}m){ $1 + '<rsp stat="ok">' + $2 + '</rsp>' }
+      # .split(/\s\s+/).join(' ') # to compact
+
+    # transform single element into attribute, and leave out element started with -
+    result.gsub!(%r{<([^-].+)>(.*)</\1>}){ $1 + '="' + $2 + '"' }
+    result.gsub!(%r{<(\w.+)>\s+((\w.*=".*"\s*)+)(.*)</\1>}m){
+      m1 = $1
+      if (m4 = $4) == "\n"
+        "<%s "%m1 + $2.split(/\s\s+/).join(' ') + ">#{m4}</#{m1}>"
+      else
+        "<%s "%$1 + $2.split(/\s\s+/).join(' ') + ' />'
+      end
+    }
+    result.gsub!(%r{<(\w.+)>\s+((.*/.*\s*)*)((\w.*=".*"\s*)+).*</\1>}){
+      m1, m2 = $1, $2 # $ would be overwrite by split
+      "<%s "%m1 + "%s>"%$4.split(/\s\s+/).join(' ') + (m2||'') + "</#{m1}>"
+    }
+
+    # transform _content to real content
+    result.gsub!(%r{\s*<-content>(.*)</-content>\s*(<.+>)}){ $1 + $2}
+
+    result
   end
+  # def to_xml
+    # @data.to_xml
+  # end
 
   # for debug
   def debug_key
@@ -119,8 +179,8 @@ class EFRTest < Test::Unit::TestCase
     efr = EmuFlickrResponse.new
     efr.outer.photo = {:id=>'1'}
     efr.outer.photo = {:id=>'2'}
-    # puts efr.to_json
-    # puts efr.to_xml
+    puts efr.to_json
+    puts efr.to_xml
   end
 end
 
