@@ -2,5 +2,5 @@
 mode: development
 runs_at_launch: 0
 identifier: emuflickr
-port: 3060
+port: 3000
 bundle: /Users/lukhnos/Applications/Locomotive2/Bundles/standardRailsMar2007.locobundle
