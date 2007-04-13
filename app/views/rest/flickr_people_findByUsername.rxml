@@ -1,0 +1,7 @@
+xml.instruct! :xml, :version => "1.0", :encoding => "utf-8"
+xml.rsp (:stat => "ok") do
+	
+	xml.user (:nsid=>@user_id) do
+		xml.username @username
+	end
+end

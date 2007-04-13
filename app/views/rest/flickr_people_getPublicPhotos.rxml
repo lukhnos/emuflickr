@@ -1,0 +1,11 @@
+xml.instruct! :xml, :version => "1.0", :encoding => "utf-8"
+xml.rsp (:stat => "ok") do
+	xml.photos (:page=>@page, :pages=>@total/@per_page, :perpage => @per_page, :total => @total) do
+
+    photo = Photo.find(@page)
+		1.times do 
+			xml.photo :id => photo.id, :owner => "68545471@N00", :secret => "123", :server => "123", :title => photo.title, :ispublic=>"1", :isfriend=>"0", :isfamily=>"0", :farm=>"1"
+		end
+
+	end
+end
