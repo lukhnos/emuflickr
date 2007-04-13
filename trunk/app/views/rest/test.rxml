@@ -1,0 +1,5 @@
+xml.rsp (:stat => "ok") do
+	xml.photos do
+		xml.photo :id=>1
+	end
+end
