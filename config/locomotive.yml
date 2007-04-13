@@ -1,5 +1,5 @@
 ---
-mode: development
+mode: production
 runs_at_launch: 0
 identifier: emuflickr
 port: 3000
