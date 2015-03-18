@@ -1,0 +1,1 @@
+emuflickr is a Flickr API emulation layer. We hope this project saves development and testing time for apps that use Flickr API, especially when their developers don't have Internet connection.
